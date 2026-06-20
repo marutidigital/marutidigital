@@ -1,0 +1,279 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* === PRIMARY BRAND COLOR (n8n Orange-Red) === */
+  --color-primary-h: 6.9;
+  --color-primary-s: 100%;
+  --color-primary-l: 67.6%;
+  --color-primary: hsl(6.9, 100%, 67.6%);          /* #FF6D5A — n8n signature orange-red */
+  --color-primary-tint-1: hsl(6.9, 100%, 18%);     /* Dark orange tint for backgrounds */
+  --color-primary-tint-2: hsl(6.9, 100%, 9%);      /* Deeper tint */
+  --color-primary-tint-3: hsl(6.9, 100%, 3%);      /* Subtlest tint */
+  --color-primary-shade-1: hsl(6.9, 100%, 89%);    /* Light shade for text on dark */
+
+  /* === SECONDARY COLOR (n8n Purple-Blue) === */
+  --color-secondary: hsl(247, 100%, 35%);           /* Deep indigo/violet */
+
+  /* === BACKGROUND LAYERS (Dark Theme) === */
+  --color-background-xlight: hsl(232, 15%, 11%);   /* Darkest — page bg: #15171f */
+  --color-background-lighter: hsl(232, 13%, 13%);  /* Sidebar/panel bg */
+  --color-background-light: hsl(232, 12%, 16%);    /* Card bg */
+  --color-background-base: hsl(232, 11%, 20%);     /* Input/control bg */
+  --color-background-dark: hsl(232, 10%, 24%);     /* Hover bg */
+
+  /* === FOREGROUND / BORDERS === */
+  --color-foreground-base: hsl(232, 10%, 24%);     /* Subtle borders */
+  --color-foreground-light: hsl(232, 10%, 30%);    /* Card borders */
+  --color-foreground-xlight: hsl(232, 10%, 36%);   /* Dividers */
+
+  /* === TEXT COLORS === */
+  --color-text-dark: hsl(0, 0%, 100%);             /* Primary white text */
+  --color-text-base: hsl(240, 4%, 70%);            /* Secondary muted text */
+  --color-text-light: hsl(220, 4.2%, 58.2%);       /* Placeholder / hint */
+  --color-text-lighter: hsl(222, 17%, 35%);        /* Disabled text */
+  --color-text-xlight: hsl(0, 0%, 100%);           /* Text on colored bg */
+
+  /* === SEMANTIC COLORS === */
+  --color-success: hsl(139, 51%, 55%);             /* Green */
+  --color-warning: hsl(40, 100%, 60%);             /* Amber */
+  --color-danger: hsl(6.9, 100%, 67.6%);           /* Red-orange (same as primary) */
+  --color-info: hsl(210, 100%, 60%);               /* Blue */
+
+  /* === TYPOGRAPHY === */
+  --font-display: 'Inter', 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* === SPACING === */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+
+  /* === BORDER RADIUS === */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 9999px;
+
+  /* === SHADOWS === */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.6);
+  --shadow-glow: 0 0 24px rgba(255, 109, 90, 0.15); /* Primary glow */
+}
+
+body {
+  font-family: var(--font-display);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text-base);
+  background-color: var(--color-background-xlight);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === Typography Helpers === */
+h1 { font-size: 2.5rem;  font-weight: 700; color: var(--color-text-dark); letter-spacing: -0.02em; }
+h2 { font-size: 1.75rem; font-weight: 600; color: var(--color-text-dark); letter-spacing: -0.01em; }
+h3 { font-size: 1.25rem; font-weight: 600; color: var(--color-text-dark); }
+h4 { font-size: 1rem;    font-weight: 600; color: var(--color-text-dark); }
+p  { font-size: 0.875rem; color: var(--color-text-base); }
+
+/* Orange gradient text — n8n hero style */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-primary) 0%, hsl(30, 100%, 65%) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* === CARD COMPONENT === */
+.n8n-card {
+  background: var(--color-background-light);
+  border: 1px solid var(--color-foreground-light);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.n8n-card::before {
+  /* Subtle gradient shimmer top-edge — n8n's signature card accent */
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.n8n-card:hover {
+  border-color: var(--color-primary-tint-1);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+
+.n8n-card:hover::before { opacity: 1; }
+
+/* Card top badge — n8n style pill tag */
+.card-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.card-badge.traffic    { background: var(--color-primary-tint-1); color: var(--color-primary); }
+.card-badge.mrr        { background: hsl(247, 50%, 20%); color: hsl(247, 100%, 75%); }
+.card-badge.passive    { background: hsl(139, 40%, 15%); color: hsl(139, 60%, 60%); }
+.card-badge.seo        { background: hsl(40, 60%, 15%); color: hsl(40, 100%, 65%); }
+
+/* === BUTTON COMPONENTS === */
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-primary:hover {
+  background: hsl(6.9, 100%, 60%);
+  box-shadow: 0 4px 16px rgba(255, 109, 90, 0.4);
+  transform: translateY(-1px);
+}
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-dark);
+  border: 1px solid var(--color-foreground-xlight);
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+.btn-ghost:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-tint-2);
+}
+.btn-ghost:active {
+  transform: scale(0.98);
+}
+
+.tech-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: var(--color-background-base);
+  border: 1px solid var(--color-foreground-light);
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-base);
+  font-family: var(--font-mono);
+}
+
+/* === GLOW EFFECTS === */
+.page-bg {
+  background: var(--color-background-xlight);
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+.hero-glow-1 {
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, hsl(6.9, 100%, 50%, 0.08) 0%, transparent 70%);
+  top: -200px; left: -200px;
+  pointer-events: none;
+}
+
+.hero-glow-2 {
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, hsl(247, 100%, 50%, 0.06) 0%, transparent 70%);
+  top: -100px; right: -100px;
+  pointer-events: none;
+}
+
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    var(--color-foreground-xlight) 30%, 
+    var(--color-primary-tint-1) 50%,
+    var(--color-foreground-xlight) 70%, 
+    transparent 100%);
+  margin: 48px 0;
+}
+
+.card-gradient-border {
+  background: linear-gradient(var(--color-background-light), var(--color-background-light)) padding-box,
+              linear-gradient(135deg, var(--color-primary), hsl(247, 100%, 65%)) border-box;
+  border: 1px solid transparent;
+}
+
+/* === TIMELINE ROADMAP Phase cards === */
+.phase-card {
+  background: var(--color-background-light);
+  border: 1px solid var(--color-foreground-light);
+  border-left: 3px solid; /* color varies per phase */
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.phase-1 { border-left-color: hsl(210, 100%, 60%); } /* Blue */
+.phase-2 { border-left-color: hsl(139, 51%, 55%);  } /* Green */
+.phase-3 { border-left-color: hsl(40, 100%, 60%);  } /* Amber */
+.phase-4 { border-left-color: hsl(6.9, 100%, 67%); } /* Orange-red (primary) */
+
+/* === MICRO-ANIMATIONS === */
+* {
+  transition: color 0.15s, background-color 0.15s, border-color 0.15s, 
+              box-shadow 0.15s, transform 0.15s, opacity 0.15s;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-background-xlight);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-foreground-light);
+  border-radius: var(--radius-pill);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-foreground-xlight);
+}
