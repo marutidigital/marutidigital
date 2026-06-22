@@ -1,10 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
+  /* ===== MARUTIDIGITAL BRAND COLORS ===== */
+  --brand-orange: #FF6B2B;
+  --brand-orange-hover: #E55A1E;
+  --brand-orange-light: rgba(255,107,43,0.1);
+  --brand-orange-muted: rgba(255,107,43,0.06);
+  --brand-dark: #111111;
+  --brand-dark-card: #1A1A1A;
+  --brand-dark-row: #222222;
+  --brand-light: #FAF9F7;
+  --brand-white: #FFFFFF;
+  --brand-text-light: #E0E0DA;
+  --brand-text-dark: #333333;
+  --brand-text-muted: #555555;
+  --brand-text-faint: #888888;
+  --brand-border: #EEEEEE;
+  --brand-border-dark: #333333;
+  --brand-green: #2ECC71;
+  --brand-red: #E74C3C;
+  --brand-yellow: #F39C12;
+  --brand-footer-bottom: #0A0A0A;
+
   /* === PRIMARY BRAND COLOR (n8n Orange-Red) === */
   --color-primary-h: 6.9;
   --color-primary-s: 100%;
@@ -19,7 +40,7 @@
   --color-secondary: hsl(247, 100%, 35%);           /* Deep indigo/violet */
 
   /* === BACKGROUND LAYERS (Dark Theme) === */
-  --color-background-xlight: hsl(232, 15%, 11%);   /* Darkest — page bg: #15171f */
+  --color-background-xlight: #111111;   /* Darkest — page bg */
   --color-background-lighter: hsl(232, 13%, 13%);  /* Sidebar/panel bg */
   --color-background-light: hsl(232, 12%, 16%);    /* Card bg */
   --color-background-base: hsl(232, 11%, 20%);     /* Input/control bg */
@@ -44,7 +65,8 @@
   --color-info: hsl(210, 100%, 60%);               /* Blue */
 
   /* === TYPOGRAPHY === */
-  --font-display: 'Inter', 'DM Sans', sans-serif;
+  --font-display: 'Inter', 'Poppins', sans-serif;
+  --font-heading: 'Poppins', 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   /* === SPACING === */
@@ -68,6 +90,9 @@
   --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.6);
   --shadow-glow: 0 0 24px rgba(255, 109, 90, 0.15); /* Primary glow */
+  --shadow-brand: 0 4px 20px rgba(255,107,43,0.25);
+  --shadow-card: 0 2px 16px rgba(0,0,0,0.06);
+  --shadow-card-hover: 0 8px 32px rgba(0,0,0,0.12);
 }
 
 body {
@@ -94,6 +119,14 @@ p  { font-size: 0.875rem; color: var(--color-text-base); }
   background-clip: text;
 }
 
+/* Brand orange gradient text */
+.brand-gradient-text {
+  background: linear-gradient(135deg, var(--brand-orange) 0%, #FF9B2B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* === CARD COMPONENT === */
 .n8n-card {
   background: var(--color-background-light);
@@ -107,7 +140,6 @@ p  { font-size: 0.875rem; color: var(--color-text-base); }
 }
 
 .n8n-card::before {
-  /* Subtle gradient shimmer top-edge — n8n's signature card accent */
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
@@ -141,7 +173,69 @@ p  { font-size: 0.875rem; color: var(--color-text-base); }
 .card-badge.passive    { background: hsl(139, 40%, 15%); color: hsl(139, 60%, 60%); }
 .card-badge.seo        { background: hsl(40, 60%, 15%); color: hsl(40, 100%, 65%); }
 
-/* === BUTTON COMPONENTS === */
+/* === BRAND BUTTON COMPONENTS === */
+.btn-brand-primary {
+  background: var(--brand-orange);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  min-height: 44px;
+}
+.btn-brand-primary:hover {
+  background: var(--brand-orange-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-brand);
+}
+.btn-brand-primary:active { transform: scale(0.98); }
+
+.btn-brand-outline {
+  background: transparent;
+  color: var(--brand-orange);
+  border: 2px solid var(--brand-orange);
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  min-height: 44px;
+}
+.btn-brand-outline:hover {
+  background: rgba(255,107,43,0.1);
+}
+
+.btn-brand-white {
+  background: white;
+  color: var(--brand-orange);
+  border: none;
+  padding: 16px 36px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  min-height: 44px;
+}
+.btn-brand-white:hover { background: var(--brand-light); }
+
+/* === BUTTON COMPONENTS (n8n legacy) === */
 .btn-primary {
   background: var(--color-primary);
   color: white;
@@ -158,9 +252,7 @@ p  { font-size: 0.875rem; color: var(--color-text-base); }
   box-shadow: 0 4px 16px rgba(255, 109, 90, 0.4);
   transform: translateY(-1px);
 }
-.btn-primary:active {
-  transform: scale(0.98);
-}
+.btn-primary:active { transform: scale(0.98); }
 
 .btn-ghost {
   background: transparent;
@@ -178,10 +270,176 @@ p  { font-size: 0.875rem; color: var(--color-text-base); }
   color: var(--color-primary);
   background: var(--color-primary-tint-2);
 }
-.btn-ghost:active {
-  transform: scale(0.98);
+.btn-ghost:active { transform: scale(0.98); }
+
+/* === BRAND SERVICE CARD === */
+.brand-service-card {
+  background: var(--brand-white);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  padding: 28px 24px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.brand-service-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
 }
 
+/* === BRAND REASON CARD === */
+.brand-reason-card {
+  background: var(--brand-white);
+  border-radius: 12px;
+  border: 1px solid var(--brand-border);
+  padding: 28px 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+
+/* === PRICE TAG === */
+.brand-price-tag {
+  display: inline-block;
+  background: rgba(255,107,43,0.1);
+  color: var(--brand-orange);
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 13px;
+}
+
+/* === SECTION BACKGROUNDS === */
+.section-dark {
+  background-color: var(--brand-dark);
+  color: var(--brand-text-light);
+}
+.section-light {
+  background-color: var(--brand-light);
+  color: var(--brand-text-dark);
+}
+.section-orange {
+  background-color: var(--brand-orange);
+  color: white;
+}
+
+/* === FAQ ACCORDION === */
+.faq-item {
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.faq-item.open {
+  border-color: var(--brand-orange);
+}
+.faq-question {
+  padding: 20px 24px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  color: var(--brand-text-dark);
+  font-size: 15px;
+  min-height: 44px;
+}
+.faq-answer {
+  padding: 0 24px 20px;
+  color: var(--brand-text-muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* === COMPARISON TABLE === */
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--brand-dark-card);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--brand-border-dark);
+}
+.comparison-table th {
+  padding: 16px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+}
+.comparison-table td {
+  padding: 14px 20px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--brand-border-dark);
+}
+.comparison-table tr:nth-child(even) { background: var(--brand-dark-row); }
+.comparison-table .col-us { background: rgba(255,107,43,0.05) !important; }
+.tick { color: var(--brand-green); font-weight: 700; }
+.cross { color: var(--brand-red); font-weight: 700; }
+.warn { color: var(--brand-yellow); font-weight: 700; }
+
+/* === WHATSAPP FLOATING BUTTON === */
+@keyframes wa-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 4px 16px rgba(37,211,102,0.4); }
+  50%       { transform: scale(1.1); box-shadow: 0 6px 24px rgba(37,211,102,0.6); }
+}
+.wa-float {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  width: 56px;
+  height: 56px;
+  background: #25D366;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  animation: wa-pulse 3s ease-in-out infinite;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+.wa-float:hover { animation: none; transform: scale(1.1); }
+.wa-tooltip {
+  position: absolute;
+  right: 68px;
+  bottom: 50%;
+  transform: translateY(50%);
+  background: #111111;
+  color: white;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.wa-float:hover .wa-tooltip { opacity: 1; }
+
+/* === TOP RIBBON === */
+.top-ribbon {
+  background: var(--brand-orange);
+  color: white;
+  text-align: center;
+  font-size: 13px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+}
+@media (max-width: 767px) {
+  .top-ribbon { display: none; }
+}
+
+/* === STATS BAR === */
+.stats-bar {
+  background: rgba(255,107,43,0.08);
+  border-top: 1px solid rgba(255,107,43,0.2);
+  border-bottom: 1px solid rgba(255,107,43,0.2);
+}
+
+/* === TECH TAG === */
 .tech-tag {
   display: inline-flex;
   align-items: center;
@@ -243,7 +501,7 @@ p  { font-size: 0.875rem; color: var(--color-text-base); }
 .phase-card {
   background: var(--color-background-light);
   border: 1px solid var(--color-foreground-light);
-  border-left: 3px solid; /* color varies per phase */
+  border-left: 3px solid;
   border-radius: var(--radius-lg);
   padding: 20px 24px;
   display: flex;
@@ -251,10 +509,19 @@ p  { font-size: 0.875rem; color: var(--color-text-base); }
   gap: 16px;
 }
 
-.phase-1 { border-left-color: hsl(210, 100%, 60%); } /* Blue */
-.phase-2 { border-left-color: hsl(139, 51%, 55%);  } /* Green */
-.phase-3 { border-left-color: hsl(40, 100%, 60%);  } /* Amber */
-.phase-4 { border-left-color: hsl(6.9, 100%, 67%); } /* Orange-red (primary) */
+.phase-1 { border-left-color: hsl(210, 100%, 60%); }
+.phase-2 { border-left-color: hsl(139, 51%, 55%);  }
+.phase-3 { border-left-color: hsl(40, 100%, 60%);  }
+.phase-4 { border-left-color: hsl(6.9, 100%, 67%); }
+
+/* === STAGGER ANIMATION === */
+@keyframes stagger-fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.stagger-in {
+  animation: stagger-fade-in 0.4s ease both;
+}
 
 /* === MICRO-ANIMATIONS === */
 * {
@@ -263,17 +530,106 @@ p  { font-size: 0.875rem; color: var(--color-text-base); }
 }
 
 /* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: var(--color-background-xlight);
-}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--color-background-xlight); }
 ::-webkit-scrollbar-thumb {
   background: var(--color-foreground-light);
   border-radius: var(--radius-pill);
 }
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-foreground-xlight);
+::-webkit-scrollbar-thumb:hover { background: var(--color-foreground-xlight); }
+
+/* === RESPONSIVE HELPERS === */
+@media (max-width: 767px) {
+  .btn-brand-primary, .btn-brand-outline {
+    width: 100%;
+    justify-content: center;
+    font-size: 16px;
+    padding: 14px 20px;
+  }
+}
+
+/* === PRICE LIST DOT LEADER === */
+.price-row {
+  display: flex;
+  align-items: baseline;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--brand-border);
+  gap: 8px;
+  transition: background 0.15s;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 4px;
+}
+.price-row:hover { background: rgba(255,107,43,0.04); }
+.price-row-name { 
+  color: var(--brand-text-dark); 
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.price-row-dots {
+  flex: 1;
+  border-bottom: 1px dotted #ccc;
+  margin: 0 8px;
+  position: relative;
+  top: -4px;
+  min-width: 20px;
+}
+.price-row-value {
+  color: var(--brand-orange);
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* === HOW IT WORKS STEP LINE === */
+.step-connector {
+  position: absolute;
+  top: 28px;
+  left: calc(50% + 28px);
+  right: calc(-50% + 28px);
+  border-top: 2px dashed rgba(255,107,43,0.4);
+}
+
+/* === ICON CIRCLE === */
+.icon-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Layout Content Wrapper for pages */
+.layout-content-wrapper {
+  padding: 16px;
+  max-width: 72rem; /* 1152px */
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .layout-content-wrapper {
+    padding: 24px;
+  }
+}
+@media (min-width: 1024px) {
+  .layout-content-wrapper {
+    padding: 32px;
+  }
+}
+
+/* Full-width breakout for marketing pages using bleed-wrapper */
+.layout-content-wrapper:has(.bleed-wrapper) {
+  padding: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+/* Redefine bleed-wrapper to have no margins when container is full-width */
+.bleed-wrapper {
+  width: 100%;
+  margin: 0;
 }

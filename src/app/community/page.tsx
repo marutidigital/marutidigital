@@ -1,506 +1,151 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Users, Disc, MessageSquare, Eye, Heart, Shield, Plus, MessageCircle, Sparkles } from 'lucide-react';
+import React from 'react';
+import Link from 'next/link';
+import { Users, MessageSquare, Check, Sparkles, Briefcase, Zap } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
-import { supabase, isSupabaseConfigured } from '@/utils/supabaseClient';
-
-interface ForumThread {
-  id: string;
-  title: string;
-  category: 'General' | 'Automation' | 'Next.js' | 'SEO' | 'Jobs';
-  author: string;
-  replies: number;
-  views: number;
-  likes: number;
-  lastActive: string;
-  created_at?: string;
-}
-
-const INITIAL_MOCK_THREADS: ForumThread[] = [
-  {
-    id: 'thread-1',
-    title: 'How are you handling the new TCS on foreign credit card transactions for international SaaS?',
-    category: 'General',
-    author: 'Aarav Gupta',
-    replies: 18,
-    views: 342,
-    likes: 24,
-    lastActive: '5m ago'
-  },
-  {
-    id: 'thread-2',
-    title: 'n8n integration help: Syncing WooCommerce order statuses directly to ProtonMail and Slack ledger nodes',
-    category: 'Automation',
-    author: 'Priya Sharma',
-    replies: 7,
-    views: 120,
-    likes: 12,
-    lastActive: '24m ago'
-  },
-  {
-    id: 'thread-3',
-    title: 'Next.js 14 hydration mismatches in app router layouts when running custom dark theme checks',
-    category: 'Next.js',
-    author: 'Vikram Singh',
-    replies: 12,
-    views: 201,
-    likes: 18,
-    lastActive: '1h ago'
-  },
-  {
-    id: 'thread-4',
-    title: 'Job: Looking for an agency to build a custom CRM integration node on a retainership model',
-    category: 'Jobs',
-    author: 'Maruti Digital',
-    replies: 4,
-    views: 88,
-    likes: 15,
-    lastActive: '3h ago'
-  },
-  {
-    id: 'thread-5',
-    title: 'Guide: Programmatic SEO configurations that helped my local e-commerce store rank for 50+ high-intent terms',
-    category: 'SEO',
-    author: 'Rohit Mehta',
-    replies: 9,
-    views: 180,
-    likes: 31,
-    lastActive: '1d ago'
-  }
-];
 
 export default function CommunityPage() {
   const { addToCart } = useCart();
-  const [selectedForumTab, setSelectedForumTab] = useState<string>('All');
-  const [forumThreads, setForumThreads] = useState<ForumThread[]>(INITIAL_MOCK_THREADS);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Fetch threads from Supabase
-  useEffect(() => {
-    async function loadSupabaseThreads() {
-      if (!isSupabaseConfigured || !supabase) return;
-      setIsLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('forum_threads')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        if (data && data.length > 0) {
-          const mapped: ForumThread[] = data.map(row => {
-            const timeDiff = Date.now() - new Date(row.created_at).getTime();
-            let lastActive = 'Just now';
-            const diffMins = Math.floor(timeDiff / 60000);
-            const diffHours = Math.floor(diffMins / 600);
-            const diffDays = Math.floor(diffHours / 24);
-
-            if (diffDays > 0) lastActive = `${diffDays}d ago`;
-            else if (diffHours > 0) lastActive = `${diffHours}h ago`;
-            else if (diffMins > 0) lastActive = `${diffMins}m ago`;
-
-            return {
-              id: row.id,
-              title: row.title,
-              category: row.category as any,
-              author: row.author_name || 'Anonymous',
-              replies: row.replies_count || 0,
-              views: row.views_count || 1,
-              likes: row.likes_count || 0,
-              lastActive,
-              created_at: row.created_at
-            };
-          });
-          setForumThreads(mapped);
-        }
-      } catch (err) {
-        console.error('Failed to fetch forum threads', err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    loadSupabaseThreads();
-  }, []);
-
-  const [newThreadTitle, setNewThreadTitle] = useState('');
-  const [newThreadCat, setNewThreadCat] = useState<'General' | 'Automation' | 'Next.js' | 'SEO' | 'Jobs'>('General');
-  const [isCreatingThread, setIsCreatingThread] = useState(false);
-
-  const handleCreateThread = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newThreadTitle) return;
-
-    const newThreadLocal: ForumThread = {
-      id: `thread-${Date.now()}`,
-      title: newThreadTitle,
-      category: newThreadCat,
-      author: 'You (Dev)',
-      replies: 0,
-      views: 1,
-      likes: 0,
-      lastActive: 'Just now'
-    };
-
-    // If Supabase is active, insert into database
-    if (isSupabaseConfigured && supabase) {
-      try {
-        const { data, error } = await supabase
-          .from('forum_threads')
-          .insert([
-            {
-              title: newThreadTitle,
-              category: newThreadCat,
-              author_name: 'You (Dev)',
-              replies_count: 0,
-              views_count: 1,
-              likes_count: 0
-            }
-          ])
-          .select();
-
-        if (error) throw error;
-        if (data && data[0]) {
-          const row = data[0];
-          setForumThreads([
-            {
-              id: row.id,
-              title: row.title,
-              category: row.category as any,
-              author: row.author_name,
-              replies: row.replies_count,
-              views: row.views_count,
-              likes: row.likes_count,
-              lastActive: 'Just now',
-              created_at: row.created_at
-            },
-            ...forumThreads
-          ]);
-        }
-      } catch (err) {
-        console.error('Failed to create thread on Supabase', err);
-        // Fallback to local state
-        setForumThreads([newThreadLocal, ...forumThreads]);
-      }
-    } else {
-      // Local fallback
-      setForumThreads([newThreadLocal, ...forumThreads]);
-    }
-
-    setNewThreadTitle('');
-    setIsCreatingThread(false);
-  };
-
-  const handleLikeThread = async (id: string) => {
-    const thread = forumThreads.find(t => t.id === id);
-    if (!thread) return;
-
-    // Increment locally first for instant feedback
-    setForumThreads(forumThreads.map(t => 
-      t.id === id ? { ...t, likes: t.likes + 1 } : t
-    ));
-
-    // If Supabase is active, update in DB
-    if (isSupabaseConfigured && supabase) {
-      try {
-        const { error } = await supabase
-          .from('forum_threads')
-          .update({ likes_count: thread.likes + 1 })
-          .eq('id', id);
-        
-        if (error) throw error;
-
-        // Optionally record like record to restrict duplicate likes
-        await supabase
-          .from('forum_likes')
-          .insert([{ thread_id: id }]);
-
-      } catch (err) {
-        console.error('Failed to record like in Supabase', err);
-      }
-    }
-  };
-
-  const forumCategories = ['All', 'General', 'Automation', 'Next.js', 'SEO', 'Jobs'];
-  
-  const filteredThreads = selectedForumTab === 'All'
-    ? forumThreads
-    : forumThreads.filter(t => t.category === selectedForumTab);
 
   const handleBuyTier = (tierName: string, price: number, id: string) => {
     addToCart({
       id: `community-${id}`,
-      name: `Tribe Membership: ${tierName}`,
+      name: `MarutiDigital Membership: ${tierName}`,
       price: price,
       category: 'Bundles',
     });
   };
 
   return (
-    <div className="space-y-8 py-4">
-      {/* Title Header */}
-      <div className="flex items-center justify-between border-b border-n8nfg-light pb-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-lg bg-primary-tint-1 border border-primary/20 text-primary">
-            <Users size={24} />
-          </div>
-          <div>
-            <h1 className="text-2xl font-extrabold text-n8ntext-dark flex items-center gap-2">
-              <span>Tribe Community</span>
-              <span className="card-badge mrr">Loyalty Loop</span>
-            </h1>
-            <p className="text-xs text-n8ntext-base">Join active developer forums, find contract jobs, and share automation node templates.</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Discord invite Banner */}
-      <section className="p-6 rounded-xl bg-gradient-to-r from-n8nbg-light to-[#5865F2]/10 border border-[#5865F2]/30 flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden group">
-        <div className="space-y-2 text-center md:text-left z-10">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-[#5865F2]/20 border border-[#5865F2]/35 text-[#5865F2] text-[10px] font-bold uppercase tracking-wide">
-            <Disc size={12} className="animate-spin" />
-            <span>Discord Server lounge</span>
-          </div>
-          <h2 className="text-base font-bold text-n8ntext-dark">Connect with 1,234+ Indian Tech Builders</h2>
-          <p className="text-xs text-n8ntext-base max-w-xl">
-            Discuss code in real-time. Channels: <strong>#automation-hacks</strong>, <strong>#nextjs-help</strong>, <strong>#gigs-marketplace</strong>, and <strong>#mastermind-lobby</strong>.
+    <div className="bleed-wrapper">
+      
+      {/* ── HEADER ── */}
+      <section style={{ backgroundColor: '#111111', padding: '80px 0 60px' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 48px' }} className="px-4 text-center">
+          <h1 style={{ fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 800, color: '#FFFFFF', marginBottom: '16px' }}>
+            The MarutiDigital Community
+          </h1>
+          <p style={{ fontSize: '18px', color: '#E0E0DA', lineHeight: 1.6 }}>
+            Join our private community of business owners, developers, and marketers. Get exclusive insights, networking opportunities, and premium support.
           </p>
         </div>
-
-        <a 
-          href="https://discord.com" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="px-5 py-2.5 rounded-lg bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-bold shadow-lg flex items-center gap-2 transition-all shrink-0 hover:-translate-y-0.5 hover:shadow-[#5865F2]/25"
-        >
-          <Disc size={16} />
-          <span>Join MarutiLounge</span>
-        </a>
       </section>
 
-      {/* Grid: Forum Discussions (7 cols) + Membership Tiers (5 cols) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        
-        {/* Forum Section */}
-        <div className="lg:col-span-7 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-n8ntext-dark uppercase tracking-wider flex items-center gap-2">
-              <MessageCircle size={16} className="text-primary" />
-              <span>Discussion Board</span>
-            </h2>
-
-            <button
-              onClick={() => setIsCreatingThread(!isCreatingThread)}
-              className="text-xs text-primary font-semibold flex items-center gap-1 hover:underline"
+      {/* ── CTA BANNER ── */}
+      <section style={{ backgroundColor: '#FAF9F7', padding: '40px 0' }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 48px' }} className="px-4">
+          <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm text-center">
+            <div className="mx-auto bg-orange-100 rounded-full w-16 h-16 flex items-center justify-center mb-6">
+              <MessageSquare size={32} style={{ color: '#FF6B2B' }} />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Start the Conversation</h2>
+            <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+              We have moved our public forums to a private Discord community to ensure high-quality discussions and dedicated support for our clients and members.
+            </p>
+            <a 
+              href="https://discord.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="btn-brand-primary inline-flex"
             >
-              <Plus size={14} />
-              <span>New Topic</span>
-            </button>
-          </div>
-
-          {/* New Thread Form */}
-          {isCreatingThread && (
-            <form onSubmit={handleCreateThread} className="bg-n8nbg-light border border-n8nfg-light p-4 rounded-xl space-y-3 animate-[fadeInUp_0.2s_ease]">
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase font-bold text-n8ntext-light">Topic Title</label>
-                <input 
-                  type="text" 
-                  placeholder="Ask a question or share a guide..." 
-                  required
-                  value={newThreadTitle}
-                  onChange={(e) => setNewThreadTitle(e.target.value)}
-                  className="w-full bg-n8nbg-base border border-n8nfg-light rounded p-2 text-xs text-n8ntext-dark focus:outline-none focus:border-primary"
-                />
-              </div>
-
-              <div className="flex justify-between items-center gap-3">
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="text-n8ntext-light text-[10px] uppercase font-bold">Category:</span>
-                  <select
-                    value={newThreadCat}
-                    onChange={(e: any) => setNewThreadCat(e.target.value)}
-                    className="bg-n8nbg-base border border-n8nfg-light rounded px-2 py-1 text-xs text-n8ntext-dark focus:outline-none cursor-pointer"
-                  >
-                    <option value="General">General</option>
-                    <option value="Automation">Automation</option>
-                    <option value="Next.js">Next.js</option>
-                    <option value="SEO">SEO</option>
-                    <option value="Jobs">Jobs</option>
-                  </select>
-                </div>
-
-                <div className="flex gap-2">
-                  <button 
-                    type="button" 
-                    onClick={() => setIsCreatingThread(false)}
-                    className="btn-ghost py-1 px-3 text-xs"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    type="submit" 
-                    className="btn-primary py-1 px-3 text-xs"
-                  >
-                    Publish
-                  </button>
-                </div>
-              </div>
-            </form>
-          )}
-
-          {/* Categories navigation */}
-          <div className="flex flex-wrap items-center gap-1 border-b border-n8nfg-light pb-2">
-            {forumCategories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedForumTab(cat)}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                  selectedForumTab === cat
-                    ? 'text-primary bg-primary-tint-1 border border-primary/10'
-                    : 'text-n8ntext-base hover:text-n8ntext-dark hover:bg-n8nbg-base'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          {/* Threads List */}
-          <div className="space-y-3">
-            {filteredThreads.map((thread) => (
-              <div 
-                key={thread.id} 
-                className="p-3 bg-n8nbg-light border border-n8nfg-light rounded-xl hover:border-n8nfg-xlight flex flex-col sm:flex-row justify-between sm:items-center gap-3 transition-colors"
-              >
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-n8nbg-base border border-n8nfg-light text-n8ntext-light">
-                      {thread.category}
-                    </span>
-                    <span className="text-[10px] text-n8ntext-light font-medium">By {thread.author}</span>
-                  </div>
-
-                  <h3 className="text-xs font-bold text-n8ntext-dark hover:text-primary transition-colors cursor-pointer leading-normal">
-                    {thread.title}
-                  </h3>
-                </div>
-
-                {/* Counters */}
-                <div className="flex items-center gap-4 text-[10px] text-n8ntext-light shrink-0">
-                  <span className="flex items-center gap-1" title="Replies count">
-                    <MessageSquare size={12} />
-                    <span>{thread.replies}</span>
-                  </span>
-                  
-                  <span className="flex items-center gap-1" title="Views count">
-                    <Eye size={12} />
-                    <span>{thread.views}</span>
-                  </span>
-
-                  <button 
-                    onClick={() => handleLikeThread(thread.id)}
-                    className="flex items-center gap-1 hover:text-danger group transition-colors"
-                    title="Like topic"
-                  >
-                    <Heart size={12} className="group-hover:fill-danger" />
-                    <span>{thread.likes}</span>
-                  </button>
-
-                  <span className="text-[9px] font-semibold text-n8ntext-lighter bg-n8nbg-base border border-n8nfg-light px-1.5 py-0.5 rounded">
-                    {thread.lastActive}
-                  </span>
-                </div>
-              </div>
-            ))}
-
-            {filteredThreads.length === 0 && (
-              <div className="h-[200px] flex items-center justify-center text-center text-xs text-n8ntext-light">
-                No discussion threads found matching category "{selectedForumTab}".
-              </div>
-            )}
+              Join the Free Server
+            </a>
           </div>
         </div>
+      </section>
 
-        {/* Membership Tiers Toggles */}
-        <div className="lg:col-span-5 space-y-4">
-          <h2 className="text-sm font-bold text-n8ntext-dark uppercase tracking-wider flex items-center gap-2">
-            <Sparkles size={16} className="text-warning fill-warning" />
-            <span>Tribe Membership Tiers</span>
-          </h2>
+      {/* ── MEMBERSHIP TIERS ── */}
+      <section style={{ padding: '80px 0', backgroundColor: '#FFFFFF' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 48px' }} className="px-4">
+          <div className="text-center mb-12">
+            <h2 style={{ fontSize: '32px', fontWeight: 700, color: '#111111', marginBottom: '12px' }}>
+              Upgrade Your Experience
+            </h2>
+            <p className="text-gray-600">Get access to premium channels, exclusive tutorials, and priority support.</p>
+          </div>
 
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             
-            {/* Free Tier */}
-            <div className="p-4 rounded-xl border border-n8nfg-light bg-n8nbg-light space-y-3">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-xs font-bold text-n8ntext-dark">Tribe Free</h3>
-                  <p className="text-[10px] text-n8ntext-light">Connect and read forum updates.</p>
-                </div>
-                <span className="text-sm font-black text-n8ntext-dark">₹0</span>
+            {/* Free */}
+            <div className="p-8 rounded-2xl border border-gray-200 bg-white flex flex-col h-full">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Free</h3>
+              <p className="text-sm text-gray-500 mb-6 flex-grow">Connect and read general updates.</p>
+              <div className="mb-8">
+                <span className="text-4xl font-black text-gray-900">$0</span>
               </div>
-              <button 
-                onClick={() => alert('Welcome to MarutiDigital Free Lounge! Standard access is active.')}
-                className="w-full btn-ghost py-1.5 text-xs font-bold"
-              >
-                Join Free Server
-              </button>
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-start gap-3 text-sm text-gray-600"><Check size={18} style={{ color: '#2ECC71' }} /> Public Discord channels</li>
+                <li className="flex items-start gap-3 text-sm text-gray-600"><Check size={18} style={{ color: '#2ECC71' }} /> General community support</li>
+              </ul>
+              <a href="https://discord.com" target="_blank" rel="noopener noreferrer" className="btn-brand-outline text-center block mt-auto">
+                Join Free
+              </a>
             </div>
 
-            {/* Pro Monthly */}
-            <div className="p-4 rounded-xl border border-primary/30 bg-primary-tint-2/20 space-y-3 relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-primary text-white text-[8px] uppercase tracking-wider font-extrabold px-3.5 py-0.5 rounded-bl">
+            {/* Pro */}
+            <div className="p-8 rounded-2xl border bg-white flex flex-col h-full relative" style={{ borderColor: '#FF6B2B', boxShadow: '0 8px 30px rgba(255,107,43,0.12)' }}>
+              <div className="absolute top-0 right-0 bg-brand-orange text-white text-[10px] uppercase font-black px-4 py-1 rounded-bl-lg" style={{ backgroundColor: '#FF6B2B' }}>
                 Popular
               </div>
-              
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-xs font-bold text-n8ntext-dark flex items-center gap-1.5">
-                    <span>Tribe Pro</span>
-                    <Shield size={12} className="text-primary" />
-                  </h3>
-                  <p className="text-[10px] text-n8ntext-light">Exclusive scripts, client referrals, mastermind groups.</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm font-black text-n8ntext-dark block">₹499</span>
-                  <span className="text-[8px] text-n8ntext-light block">/ month</span>
-                </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+                Pro <Sparkles size={18} style={{ color: '#FF6B2B' }} />
+              </h3>
+              <p className="text-sm text-gray-500 mb-6 flex-grow">Exclusive tutorials and priority support.</p>
+              <div className="mb-8 flex items-baseline gap-1">
+                <span className="text-4xl font-black text-gray-900">$9</span>
+                <span className="text-sm text-gray-500">/ month</span>
               </div>
-              
-              <button 
-                onClick={() => handleBuyTier('Tribe Pro', 499, 'pro')}
-                className="w-full btn-primary py-1.5 text-xs font-bold"
-              >
-                Buy Pro Membership
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-start gap-3 text-sm text-gray-600"><Check size={18} style={{ color: '#2ECC71' }} /> Everything in Free</li>
+                <li className="flex items-start gap-3 text-sm text-gray-600"><Check size={18} style={{ color: '#2ECC71' }} /> Private Pro Discord channels</li>
+                <li className="flex items-start gap-3 text-sm text-gray-600"><Check size={18} style={{ color: '#2ECC71' }} /> Priority 12hr support responses</li>
+                <li className="flex items-start gap-3 text-sm text-gray-600"><Check size={18} style={{ color: '#2ECC71' }} /> Monthly exclusive tutorials</li>
+              </ul>
+              <button onClick={() => handleBuyTier('Pro Monthly', 9, 'pro')} className="btn-brand-primary w-full mt-auto">
+                Upgrade to Pro
               </button>
             </div>
 
             {/* Lifetime */}
-            <div className="p-4 rounded-xl border border-n8nfg-light bg-n8nbg-light space-y-3">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-xs font-bold text-n8ntext-dark">Tribe Lifetime</h3>
-                  <p className="text-[10px] text-n8ntext-light">One-time payment for lifetime mastermind access.</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm font-black text-n8ntext-dark block">₹4,999</span>
-                  <span className="text-[8px] text-n8ntext-light block">One-time fee</span>
-                </div>
+            <div className="p-8 rounded-2xl border border-gray-200 bg-white flex flex-col h-full">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Lifetime</h3>
+              <p className="text-sm text-gray-500 mb-6 flex-grow">Pay once, access forever.</p>
+              <div className="mb-8 flex items-baseline gap-1">
+                <span className="text-4xl font-black text-gray-900">$99</span>
+                <span className="text-sm text-gray-500">one-time</span>
               </div>
-              
-              <button 
-                onClick={() => handleBuyTier('Tribe Lifetime', 4999, 'lifetime')}
-                className="w-full btn-ghost py-1.5 text-xs font-bold"
-              >
-                Buy Lifetime Ticket
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-start gap-3 text-sm text-gray-600"><Check size={18} style={{ color: '#2ECC71' }} /> Everything in Pro</li>
+                <li className="flex items-start gap-3 text-sm text-gray-600"><Check size={18} style={{ color: '#2ECC71' }} /> Lifetime access (no rebills)</li>
+                <li className="flex items-start gap-3 text-sm text-gray-600"><Check size={18} style={{ color: '#2ECC71' }} /> Direct 1-on-1 monthly call</li>
+              </ul>
+              <button onClick={() => handleBuyTier('Lifetime Access', 99, 'lifetime')} className="btn-brand-outline w-full mt-auto">
+                Get Lifetime Access
               </button>
             </div>
 
           </div>
         </div>
+      </section>
 
-      </div>
+      {/* ── JOIN OUR TEAM BANNER ── */}
+      <section style={{ backgroundColor: '#111111', padding: '60px 0' }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 48px' }} className="px-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="text-center md:text-left">
+              <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2 justify-center md:justify-start">
+                <Briefcase style={{ color: '#FF6B2B' }} /> Join Our Specialist Team
+              </h2>
+              <p className="text-gray-400">Are you a talented developer or designer? We are always looking for experts to join our roster.</p>
+            </div>
+            <Link href="/join-us" className="btn-brand-primary whitespace-nowrap">
+              Apply to Join Team <Zap size={18} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }

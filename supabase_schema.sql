@@ -286,3 +286,78 @@ alter table public.gig_team_assignments enable row level security;
 create policy "Admin can manage team assignments." on public.gig_team_assignments for all using (
   exists (select 1 from auth.users where auth.users.id = auth.uid() and auth.users.email = 'marutidigitalweb@gmail.com')
 );
+
+
+-- 12. FREE WEBSITE APPLICATIONS TABLE
+create table public.free_website_applications (
+  id uuid default gen_random_uuid() primary key,
+  application_id text unique not null,
+  status text default 'pending', -- 'pending', 'approved', 'declined'
+  
+  -- Step 1
+  website_type text not null,
+  
+  -- Step 2
+  applicant_name text not null,
+  business_name text not null,
+  email text not null,
+  phone text not null,
+  whatsapp text,
+  city text not null,
+  country text not null,
+  business_type text not null,
+  business_age text not null,
+  
+  -- Step 3
+  industry text not null,
+  description text not null,
+  
+  -- Step 4
+  has_domain boolean not null,
+  willing_to_pay_domain text,
+  
+  -- Step 5
+  has_hosting boolean not null,
+  willing_to_pay_hosting text,
+  
+  -- Step 6
+  has_logo boolean not null,
+  logo_url text,
+  has_photos boolean not null,
+  
+  -- Step 7
+  products_count text,
+  product_categories text,
+  needs_online_payment boolean,
+  needs_shipping_options boolean,
+  
+  services_list text,
+  needs_online_booking boolean,
+  service_area text,
+  
+  -- Step 8
+  features_wanted text[] default '{}',
+  content_status text,
+  social_media text,
+  timeline text,
+  
+  -- Step 9
+  referral_source text,
+  
+  created_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+alter table public.free_website_applications enable row level security;
+
+create policy "Anyone can submit a free website application." on public.free_website_applications
+  for insert with check (true);
+
+create policy "Admin can view and manage free website applications." on public.free_website_applications
+  for all using (
+    exists (
+      select 1 from auth.users 
+      where auth.users.id = auth.uid() 
+      and auth.users.email = 'marutidigitalweb@gmail.com'
+    )
+  );
+

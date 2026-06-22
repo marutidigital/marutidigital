@@ -15,6 +15,22 @@ export default function CartDrawer() {
   if (!isCartOpen) return null;
 
   const handleCheckout = async () => {
+    try {
+      const response = await fetch('/api/checkout/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: cart })
+      });
+      const data = await response.json();
+      
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+    } catch (err) {
+      console.error('Failed to initiate Stripe checkout', err);
+    }
+
     if (isSupabaseConfigured && supabase) {
       try {
         const { error } = await supabase
