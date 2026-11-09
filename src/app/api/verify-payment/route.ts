@@ -11,6 +11,9 @@ export async function GET(request: Request) {
     }
 
     const secretKey = process.env.STRIPE_SECRET_KEY;
+    if (!secretKey) {
+      return NextResponse.json({ error: 'Stripe secret key not configured' }, { status: 500 });
+    }
 
     const stripe = new Stripe(secretKey);
     const session = await stripe.checkout.sessions.retrieve(sessionId);
