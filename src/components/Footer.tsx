@@ -95,6 +95,7 @@ export default function Footer() {
                 { label: 'Join Our Community', href: '/community' },
                 { label: 'Join Our Team', href: '/join-us' },
                 { label: 'About Us', href: '/about' },
+                { label: 'Client Payment (EUR €)', href: '/pay' },
                 { label: 'Blog & Tutorials', href: '/blog' },
               ].map(({ label, href }) => (
                 <li key={label}>
@@ -118,6 +119,7 @@ export default function Footer() {
             </div>
             <div className="flex flex-col gap-2 mt-2">
               {[
+                { label: '✓ 7-Day 100% Refund Guarantee', color: '#2ECC71' },
                 { label: '✓ Pay After Satisfaction', color: '#2ECC71' },
                 { label: '✓ Free Revisions', color: '#2ECC71' },
                 { label: '✓ 24hr Response', color: '#2ECC71' },
